@@ -1,0 +1,11 @@
+Package: ExoR
+Type: Package
+Title: Analysis Tools for NASA Exoplanet Data
+Version: 0.1.0
+Author: Trang Ly
+Maintainer: Trang Ly <lytt6@vcu.edu>
+Description: Provides functions for analyzing and visualizing NASA Exoplanet data.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
