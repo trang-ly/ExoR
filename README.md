@@ -39,7 +39,7 @@ create_scatterplot(exoplanets, pl_radj, st_rad, "Comparison of Planet Radius and
 # etc.
 ```
 
-A complete analysis of the exoplanet data in S_2023.10.04_12.36.20.csv is available for view in the NASA_exoplanet_data_analysis.Rmd or knitted NASA_exoplanet_data_analysis.pdf file.
+A complete analysis of the exoplanet data in S_2023.10.04_12.36.20.csv is available for view in the [NASA_exoplanet_data_analysis.Rmd](https://github.com/trang-ly/ExoR/blob/main/NASA_exoplanet_data_analysis.Rmd) or knitted [NASA_exoplanet_data_analysis.pdf](https://github.com/trang-ly/ExoR/blob/main/NASA_exoplanet_data_analysis.pdf) file.
 
 ## Documentation
 
