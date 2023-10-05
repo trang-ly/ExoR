@@ -1,0 +1,153 @@
+---
+title: "NASA Exoplanet Data Analysis in R"
+author: "Trang Ly"
+date: "2023-10-04"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+## NASA Planetary Systems Dataset
+
+Acknowledgement: "This research has made use of the NASA Exoplanet Archive, which is operated by the California Institute of Technology, under contract with the National Aeronautics and Space Administration under the Exoplanet Exploration Program."
+
+This archive is designed to provide researchers, astronomers, and enthusiasts with easy access to a comprehensive catalog of data related to exoplanets and their host stars.
+
+Two data sets pertaining to the Planetary Systems are available:
+
+* Planetary Systems, and
+* Planetary Systems Composite Data
+
+For the analyses in this project, I will be using the [Planetary Systems data](https://exoplanetarchive.ipac.caltech.edu/cgi-bin/TblView/nph-tblView?app=ExoTbls&config=PS). ver. Wed Oct 4 12:36:20 2023
+
+# Analyses
+
+There are over 200 variables and 30,000 observations.
+For my analyses, I will focus on the following variables, their observations, and relationships:
+
+* discoverymethod: Discovery Method
+* disc_year: Discovery Year
+* pl_radj: Planet Radius [Jupiter Radius]
+* pl_massj: Planet Mass [Jupiter Mass]
+* st_rad: Stellar Radius [Solar Radius]
+* st_mass: Stellar Mass [Solar mass]
+
+### Load Packages
+```{r}
+library(dplyr)
+library(ggplot2)
+library(ExoR)
+```
+
+### Load Data
+```{r}
+# Load the NASA exoplanet data
+exoplanets <- read.csv("PS_2023.10.04_12.36.20.csv", skip = 290)
+# head(exoplanets)  # preview data
+```
+
+## Exoplanet Discovery
+
+### Distribution of exoplanet discovery methods
+```{r}
+# A bar plot of exoplanet discovery methods in descending order
+create_barplot(exoplanets, discoverymethod, count, "Exoplanet Discoveries by Discovery Method", "Discovery Method", "Number of Discoveries")
+```
+
+### Distribution of exoplanet discovery years
+```{r}
+# A bar plot of exoplanet discoveries by year in descending order
+create_barplot(exoplanets, disc_year, count, "Exoplanet Discoveries by Year", "Discovery Year", "Number of Discoveries")
+```
+
+### Trends in exoplanet discovery
+```{r}
+# A look at exoplanet discoveries throughout the years
+# Line plot
+create_line_plot(exoplanets, disc_year, count, "Number of Exoplanet Discoveries Over Time", "Discovery Year", "Number of Discoveries")
+```
+
+### The most used method by year:
+```{r}
+most_used_methods <- exoplanets %>%
+  group_by(disc_year, discoverymethod) %>%
+  summarise(count = n()) %>%
+  arrange(disc_year, desc(count)) %>%
+  slice(1) %>%
+  ungroup()
+
+# Print the results
+print(most_used_methods)
+```
+
+### Summary
+Since 2007, the transit method has become the predominant means of discovering exoplanets, peaking at 12,716 total discoveries in 2016. The years 2014 and 2016 account for 21,759 out of 35,086 total observations, making up 62% of the total exoplanet discoveries from 1992 to 2023. The number of exoplanet discoveries has increased steadily over time, with a particularly sharp increase in 2016, 2014, and somewhat in 2021.
+
+## Exoplanet vs. Host Star Comparisons
+
+### Planet Radius (in Jupiter Radii) vs. Host Star (in Solar Radii)
+```{r}
+# A scatter plot of planet radius vs its host star radius
+create_scatterplot(exoplanets, pl_radj, st_rad, "Comparison of Planet Radius and Host Star Radius", "Planet Radius (in Jupiter Radii)", "Host Star Radius (in Solar Radii)", y_max_limit = 6)
+```
+
+```{r}
+# Calculating correlation coefficient and linear regression for planet radius and host star radius
+calculate_correlation_and_regression(exoplanets, "pl_radj", "st_rad")
+```
+
+### Planet Mass (in Jupiter Mass) vs. Host Star Mass (in Solar Mass)
+```{r}
+# A scatter plot of planet mass vs its host star mass
+create_scatterplot(exoplanets, pl_bmassj, st_mass, "Comparison of Planet Mass and Host Star Mass", "Planet Mass (in Jupiter Mass)", "Host Star Mass (in Solar Mass)")
+```
+
+```{r}
+# Calculating correlation coefficient and linear regression for planet mass and host star mass
+calculate_correlation_and_regression(exoplanets, "pl_bmassj", "st_mass")
+```
+
+### Summary
+Correlation coefficient:
+
+* There is a 0.37 correlation coefficient for the relationship between a planet's radius and its host star radius. This indicates a positive correlation, meaning that as one increases, the other tends to increase, but the relationship is not very strong. The value of 0.37 suggests a moderately weak positive linear relationship.
+* There is a 0.27 correlation coefficient for the relationship between a planet's mass and its host star mass. This also indicates a positive correlation, but the relationship is weaker than in the previous case. The value of 0.27 suggests a relatively weak positive linear relationship.
+
+In both cases, the correlation coefficients suggest that there is some positive linear relationship between the two variables, but it's not very strong.
+
+Linear Regression Model:
+
+* Model 1: Planet Radius vs Host Star Radius -
+  * Significance: Both the intercept and the coefficient for host star radius are highly significant (p < 0.001), indicating a strong association with planet radius.
+  * R-squared: The multiple R-squared value is 0.1394, suggesting that about 13.94% of the variability in planet radius is explained by host star radius.
+
+* Model 2: Planet Mass vs. Host Star Mass -
+  * Significance: Both the intercept and the coefficient for host star mass are highly significant (p < 0.001), indicating a strong association with planet mass.
+  * R-squared: The multiple R-squared value is 0.07202, suggesting that about 7.20% of the variability in planet mass is explained by host star mass.
+
+In both cases, the R-squared values are relatively low, indicating that only a small portion of the variability is explained. Overall, these models suggest that there are statistically significant positive relationships between the planet properties (radius or mass) and their host star properties (radius or mass). However, the explanatory power of these relationships is limited, as indicated by the relatively low R-squared values. Other factors not included in the models may also influence planet/star properties.
+
+# Analysis/Data Considerations
+
+## Limitations
+
+As initially noted, two data sets pertaining to the Planetary Systems are available:
+
+* Planetary Systems, and
+* Planetary Systems Composite Data
+
+For the analyses in this project I have elected to use the Planetary Systems data. The choice between the Planetary Systems and the Planetary Systems Composite Data stems from the way data is organized and presented within the archive. <br>
+
+In the Planetary Systems data set, each row corresponds to a single reference and contains a self-contained set of parameters for each planetary system. For any given reference, the table captures all available data for the planets and their host stars. However, not all references provide a comprehensive set of stellar and planetary parameters. A single row may be missing values for certain parameters, even though those values might be available in other rows. <br>
+
+In contrast, the Planetary Systems Composite Data is designed to address the needs of users who prefer a more complete data set, with only one row per planet (removing duplicate rows). This table aggregates and compiles data from various references, aiming to provide a more comprehensive view of each planet. However, this completeness comes at the cost of potential inconsistencies, as the data may be drawn from multiple sources. Thus, while this table offers a more filled-in set of parameters, it may not maintain the same level of self-consistency found in the Planetary Systems data set. <br>
+
+The choice of data set for analysis ultimately has a minimal impact on the overarching insights drawn from the study. While the specific numerical values, calculations, and resulting graphical representations may vary, the fundamental information remains consistent. As an example, 2016 consistently emerges as the year with the highest number of exoplanet discoveries. The selection of one data set over the other influences quantitative aspects, such as the exact count of discoveries, but it does not alter the qualitative patterns or overarching trends in the data. <br>
+
+

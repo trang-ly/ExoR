@@ -23,7 +23,7 @@ library(dplyr)
 create_scatterplot <- function(data, x_col, y_col, title, x_label, y_label, y_max_limit = NULL) {
   # Create a scatter plot using ggplot2 with labels
   plot <- ggplot(data, aes(x = {{x_col}}, y = {{y_col}})) +
-    geom_point() +
+    geom_point(color = "blue") +
     labs(title = title,
          x = x_label,
          y = y_label) +
